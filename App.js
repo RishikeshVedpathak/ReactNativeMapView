@@ -4,7 +4,7 @@ import MapView from "react-native-maps";
 import styles from "./styles";
 
 // Disable yellow box warning messages
-// console.disableYellowBox = true;
+console.disableYellowBox = true;
 
 export default class App extends Component {
   constructor(props) {
@@ -79,12 +79,52 @@ export default class App extends Component {
   onLocationSelect = () => alert(this.state.userLocation);
 
   render() {
-    return (<MapView
-      style={{ ...styles.map, marginTop: this.state.marginTop }}
-      initialRegion={this.state.region}
-      showsUserLocation={true}
-      onMapReady={this.onMapReady}
-      onRegionChangeComplete={this.onRegionChange}
-    ></MapView>);
+    if (this.state.loading) {
+      return (
+        <View style={styles.spinnerView}>
+          <ActivityIndicator size="large" color="#0000ff" />
+        </View>
+      );
+    } else {
+      return (
+        <View style={styles.container}>
+          <View style={{ flex: 2 }}>
+            {!!this.state.region.latitude && !!this.state.region.longitude &&
+              <MapView
+                style={{ ...styles.map, marginTop: this.state.marginTop }}
+                initialRegion={this.state.region}
+                showsUserLocation={true}
+                onMapReady={this.onMapReady}
+                onRegionChangeComplete={this.onRegionChange}
+              >
+                {/* <MapView.Marker
+                  coordinate={{ "latitude": this.state.region.latitude, "longitude": this.state.region.longitude }}
+                  title={"Your Location"}
+                  draggable
+                /> */}
+              </MapView>
+            }
+
+            <View style={styles.mapMarkerContainer}>
+              <Text style={{ fontFamily: 'fontawesome', fontSize: 42, color: "#ad1f1f" }}>&#xf041;</Text>
+            </View>
+          </View>
+          <View style={styles.deatilSection}>
+            <Text style={{ fontSize: 16, fontWeight: "bold", fontFamily: "roboto", marginBottom: 20 }}>Move map for location</Text>
+            <Text style={{ fontSize: 10, color: "#999" }}>LOCATION</Text>
+            <Text numberOfLines={2} style={{ fontSize: 14, paddingVertical: 10, borderBottomColor: "silver", borderBottomWidth: 0.5 }}>
+              {!this.state.regionChangeProgress ? this.state.userLocation : "Identifying Location..."}</Text>
+            <View style={styles.btnContainer}>
+              <Button
+                title="PICK THIS LOCATION"
+                disabled={this.state.regionChangeProgress}
+                onPress={this.onLocationSelect}
+              >
+              </Button>
+            </View>
+          </View>
+        </View>
+      );
+    }
   }
 }
